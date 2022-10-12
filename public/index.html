@@ -2,14 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="X-Content-Type-Options: nosniff" charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
+
     <script src="https://unpkg.com/ml5@0.4.2/dist/ml5.min.js"></script>
     <title>Document</title>
 </head>
-<body>
+<body onload="printBtn();">
+   
+    <div >
+        <input type="checkbox" id="play" >PLAY</button>
+        <input type="range" id="tempo" min=".5" max="20" value="10">
+   
+     <button onclick="trainDataButton()">Train Data</button>
+     <button onclick="clear();finishedTraining()">Iteration</button>
+  
+    </div>
     <script src="sketch.js"></script>
 </body>
 </html>

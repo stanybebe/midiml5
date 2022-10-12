@@ -4,69 +4,183 @@ let model;
 var inputs = [];
 var counter = 0;
 let newData = [];
+var data = [];
+var isOn;
+var count=0;
+var measure =[];
+let measureContents=[];
+var on = false;
+var selectedDiv=[];
 var mapRange = function(from, to, s) {
     return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
   };
+
+  var tempo = document.getElementById('tempo');
+  var checkbox = document.getElementById('play');
+  var mapRange = function(s, from, to) {
+      return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
+    };
+  // checkbox.addEventListener('change',async function() {
+  //   if (this.checked) {
+  //         await Tone.start()
+  //         isOn = true;
+  //         console.log('audio is ready')
+  //   } else {
+  //     Tone.stop;
+  //   }
+  // });
+  const refreshRate = 1000 / 64;
+  var index=0;
+   document.getElementById('play').checked = false;
+   document.querySelector('play')?.addEventListener('checked', async () => {
+    await Tone.start()
+    console.log('audio is ready')
+  })
+  var notes =['C4','C#4','D4','D#4','E4','F4','F#4','G4','G#4','A4', 'A#4', "B4","rest"];  
+  var noteNum = [60,61,62,63,64,65,66,67,68,69,70,71];
+  var notesToPlay = [];
+
+  const reverb = new Tone.Reverb({
+    "wet": .5,
+    "decay": 2.5,
+    "preDelay": 0.01
+  }).toDestination();
+
+const filterLead = new Tone.Filter(2000, "lowpass").connect(reverb);
+
+
+const synth = new Tone.Synth({
+  "oscillator": {
+   "type": "sawtooth"
+}
+}).connect(filterLead);
+synth.volume.value =-5;
+
+var selected = document.getElementById('div'+index);
+
+function printBtn() {
+
+   
+  for (var i = 0; i < 32; i++) {
+      let div = document.createElement("div")
+      div.setAttribute("style", "display: block;width:300px;");
+      div.setAttribute("id","div"+i);
+      document.body.appendChild(div);
+      measure.push(i*4);
+
+      for (var j = 0; j < 12; j++) {
+     var btn = document.createElement("input");
+     btn.setAttribute("type", "radio");
+     btn.setAttribute("name", "group"+i);
+     btn.setAttribute("class", "btn");
+     btn.setAttribute("id","btn"+j);
+     btn.setAttribute("value",notes[j]);
+     div.appendChild(btn);
+    
+      }
+    
+  }
+
+
+}
+
+function updateSeq(){
+   
+  var selected = document.getElementById('div'+index);
+  
+  selected.style.backgroundColor = "red";
+  selected.style.backgroundColor = "white";
+
+for (let i = 0; i < selected.children.length; i++) {
+  
+  if(selected.children[i].checked){
+  notesToPlay.unshift(selected.children[i].value);
+  // console.log(notesToPlay);
+  }
+ 
+}
+
+}
+var play = document.querySelector('input[id="play"]');
+play.addEventListener('change', () => {
+    if(play.checked) {
+      isOn = true;
+    } else {
+      isOn = false;
+    }
+  });
+
+    setInterval(() => {  
+  
+    
+    count++;
+    // console.log(count);
+    if(count > document.getElementById('tempo').value){
+    count = 0;
+    if(isOn===true){  
+    Tone.start();
+    updateSeq();
+
+    index++;
+    var prevIndex = index -1;
+    
+    if(notesToPlay.length === 1){
+       
+        synth.triggerAttackRelease(notesToPlay[0],'64n');
+    }   
+
+
+
+    if(index>=32){
+      index = 0;
+  }
+  if(index != prevIndex){
+    
+      notesToPlay.length = 0;
+
+      var selected = document.getElementById('div'+index);
+      selected.style.backgroundColor = "red";
+    }
+
+
+  }}}
+  ,refreshRate);
+
+
+  function makeFile(){
+    isOn = false;
+  
+    
+    var time = 0;
+    for (let i = 0; i < 32; i++) {
+      selectedDiv.push(document.getElementById('div'+i));
+  for (let j = 0; j < 12; j++) {
+  if(selectedDiv[i].children[j].checked===true){  
+  data.push([noteNum[j],measure[i]]);
+  
+  }
+
+  }
+   
+  }
+
+  console.log(data);
+
+  }
 function setup() {
-  createCanvas(400, 400);
+  // createCanvas(400, 400);
+  noCanvas();
 
   let options = {
 
-    task: 'regression',
+    // task: 'classification',
     debug: 'true'
   };
 
   model = ml5.neuralNetwork(options);
-//   var data = loadJSON('/test.json')
-
-  console.log(data[12][1])
- for (let item = 0; item < data.length; item++) {
-
-      model.data.addData(
-      {
-        input0: data[item][0],
-        input1: data[item][1],
-      },
-      {
-        output0: data[item][0],
-        output1: data[item][1]
-      });
-    // model.addData([data[item][0]],[data[item][1]]);
-};
-  
-  model.normalizeData();
-
-
-
-const trainingOptions = {
-  epochs: 64,
-  batchSize: 12
 
 }
-model.train(trainingOptions, finishedTraining);
 
-
-  background(255);
-}
-
-function modelLoaded() {
-  console.log('model loaded');
-  dataLoaded();
-}
-
-function dataLoaded() {
-  console.log(model.data);
-//   let data = model.data.data.raw;
-  
-
-//   model.normalizeData();
-  let options = {
-    epochs: 200
-  }
-  model.train(options, whileTraining, finishedTraining);
-  
- 
-}
 
 
 
@@ -74,83 +188,95 @@ function whileTraining(epoch, loss) {
   console.log(epoch);
 }
 
-// function finishedTraining() {
-//   console.log('finished training.');
-//   for (let index = 0; index < 36; index++) {
-//     inputs.push([random(0, 1),random(0, 1)]);
-      
-//   }
-//   console.log(inputs);
-// gotResults();
-// }
 
 
 
-function finishedTraining() {
-    console.log('finished training.');
-   
-    if (counter <35) {
-    var m = mapRange([0,35],[0,1200],counter)
-      model.predict([floor(random(0, 127)),m], (err, results) => {
+function finishedTraining(err) {
+    console.log("finishedTraining");
+  
+  for(let i =0;i<data.length;i++){
+
+
+      model.predict([floor(random(60, 71)), floor(random(0, 32))], (err, results) => {
         if (err) {
           console.log(err);
           return;
         }
         
-        
         newData.push(results);
-       
-       
-        ;
-        counter += 1;
-        finishedTraining();
+
+
+     
+   
       });
+      
     }
     var ndJSON = JSON.stringify(newData);
-    console.log(ndJSON)
-  }
+    console.log(newData)
 
-var data=[
-    [ 63, 0 ],    [ 68, 192 ],
-     [ 70, 288 ],  [ 73, 288 ],
-     [ 71, 384 ],  [ 75, 576 ],
-     [ 76, 672 ],  [ 75, 768 ],
-     [ 78, 768 ],  [ 76, 912 ],
-     [ 75, 960 ],  [ 76, 1008 ],
-     [ 80, 1056 ], [ 83, 1152 ],
-     [ 78, 1248 ], [ 80, 1344 ],
-     [ 83, 1392 ], [ 87, 1392 ],
-     [ 68, 0 ],    [ 80, 144 ],  [ 78, 192 ],
-     [ 75, 240 ],  [ 75, 384 ],  [ 78, 408 ],
-     [ 75, 432 ],  [ 73, 456 ],  [ 70, 480 ],
-     [ 73, 504 ],  [ 70, 528 ],  [ 68, 552 ],
-     [ 63, 576 ],  [ 67, 576 ],  [ 63, 648 ],
-     [ 68, 648 ],  [ 70, 720 ],  [ 71, 744 ],
-     [ 70, 768 ],  [ 75, 792 ],  [ 71, 816 ],
-     [ 70, 840 ],  [ 68, 864 ],  [ 75, 936 ],
-     [ 75, 984 ],  [ 75, 1008 ], [ 75, 1056 ],
-     [ 80, 1104 ], [ 82, 1152 ], [ 85, 1176 ],
-     [ 82, 1200 ], [ 80, 1224 ], [ 80, 1272 ],
-     [ 82, 1296 ], [ 87, 1320 ], [ 82, 1344 ],
-     [ 80, 1368 ], [ 90, 1392 ], [ 88, 1416 ],
-     [ 90, 1440 ], [ 88, 1464 ], [ 87, 1488 ],
-     [ 82, 0 ],    [ 78, 48 ],   [ 75, 96 ],
-     [ 73, 144 ],  [ 72, 192 ],  [ 75, 240 ],
-     [ 82, 288 ],  [ 85, 288 ],  [ 78, 384 ],
-     [ 82, 384 ],  [ 75, 432 ],  [ 70, 480 ],
-     [ 72, 528 ],  [ 75, 576 ],  [ 66, 624 ],
-     [ 66, 768 ],  [ 68, 864 ],  [ 73, 864 ],
-     [ 78, 864 ],  [ 68, 960 ],  [ 73, 960 ],
-     [ 78, 960 ],  [ 68, 1008 ], [ 73, 1008 ],
-     [ 78, 1008 ], [ 80, 1200 ], [ 82, 1248 ],
-     [ 85, 1296 ], [ 82, 1344 ], [ 80, 1392 ],
-     [ 78, 1440 ], [ 75, 1488 ],
-     [ 80, 0 ],    [ 82, 48 ],   [ 83, 96 ],
-     [ 82, 144 ],  [ 78, 192 ],  [ 75, 288 ],
-     [ 82, 336 ],  [ 87, 528 ],  [ 82, 576 ],
-     [ 81, 624 ],  [ 82, 672 ],  [ 83, 816 ],
-     [ 82, 840 ],  [ 80, 864 ],  [ 78, 888 ],
-     [ 77, 912 ],  [ 78, 936 ],  [ 80, 960 ],
-     [ 82, 984 ],  [ 81, 1008 ], [ 82, 1032 ],
-     [ 78, 1056 ], [ 77, 1080 ], [ 75, 1104 ],
-     [ 82, 1248 ], [ 87, 1272 ]];
+    fetch("/api", {
+      method: 'POST', // or 'PUT'
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Success:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+      
+    }
+
+function clear(){
+  newData = [];
+}
+function trainDataButton(){
+  makeFile();  
+
+console.log(data);
+for(let times = 0; times < 100; times++){
+ for (let item = 0; item < data.length; item++) {
+
+  model.data.addData(
+    {
+      input0: data[item][0],
+      input1: data[item][1],
+    },
+    {
+      output0: data[item][0],
+      output1: data[item][1],
+    });
+
+ }
+}
+ 
+
+  model.normalizeData();
+  console.log(model.data)
+
+
+const trainingOptions = {
+
+  epochs: 100,
+  debug: true,
+  task: 'regression',
+  layers: [
+    {
+      type: 'dense',
+      activation: 'relu'
+    }
+  ]
+ 
+}
+
+
+  model.train(trainingOptions, finishedTraining);
+
+ 
+ 
+
+}
