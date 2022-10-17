@@ -23,10 +23,10 @@ var midit = new Midi()
 // add a track
 const track = midit.addTrack()
 for (let index = 0; index < data.length; index++) {
-  console.log(data[index][0].label);
+  console.log(data.length);
 
    track.addNote({
-      name : data[index][0].label,
+      name : data[index][Math.floor(Math.random(0,3))].label,
       ticks : Math.floor(Math.random(0,32)+(index*2)/4)*128,
       duration: .09})
 
@@ -50,20 +50,6 @@ const newDJ = fs.readFileSync('public/newData.json', 'utf8');
    
 // }
 
-// let data = JSON.stringify(tracks);
-// fs.writeFileSync('D.json', data);
-function toFindDuplicates(arry) {
-  const uniqueElements = new Set(arry);
-  const filteredElements = arry.filter(item => {
-      if (uniqueElements.has(item)) {
-          uniqueElements.delete(item);
-      } else {
-          return item;
-      }
-  });
-
-  return [...new Set(uniqueElements)]
-}
 
 
 const server = http.createServer(app)

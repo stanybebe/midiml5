@@ -198,7 +198,7 @@ function finishedTraining(err) {
   
   for(let i =0;i<data.length;i++){
 
- let input={input0:floor(random(60, 71))}
+ let input={input0:floor(random(0, 127))}
       model.classify(input, (err, results) => {
         if (err) {
           console.log(err);
@@ -231,7 +231,7 @@ function finishedTraining(err) {
       .catch((error) => {
         console.error('Error:', error);
       });
-      
+      clear();
     }
 
 function clear(){
@@ -259,7 +259,7 @@ console.log(data);
 
 const trainingOptions = {
 
-  epochs: 50,
+  epochs: 200,
   debug: true
   // layers: [
   //   {
