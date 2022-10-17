@@ -23,11 +23,11 @@ var midit = new Midi()
 // add a track
 const track = midit.addTrack()
 for (let index = 0; index < data.length; index++) {
- 
+  console.log(data[index][0].label);
 
    track.addNote({
-      midi : Math.floor(data[index][0].value),
-      ticks : Math.floor(data[index][1].value+(index*2)/4)*128,
+      name : data[index][0].label,
+      ticks : Math.floor(Math.random(0,32)+(index*2)/4)*128,
       duration: .09})
 
       

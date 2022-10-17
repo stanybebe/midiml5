@@ -11,6 +11,7 @@ var measure =[];
 let measureContents=[];
 var on = false;
 var selectedDiv=[];
+var filterNotes =[];
 var mapRange = function(from, to, s) {
     return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
   };
@@ -157,7 +158,7 @@ play.addEventListener('change', () => {
   for (let j = 0; j < 12; j++) {
   if(selectedDiv[i].children[j].checked===true){  
   data.push([noteNum[j],measure[i]]);
-  
+  filterNotes.push(j);
   }
 
   }
@@ -172,9 +173,10 @@ function setup() {
   noCanvas();
 
   let options = {
-
-    // task: 'classification',
-    debug: 'true'
+    inputs:1,
+    outputs:1,
+    debug: 'true',
+    task: 'classification'
   };
 
   model = ml5.neuralNetwork(options);
@@ -196,8 +198,8 @@ function finishedTraining(err) {
   
   for(let i =0;i<data.length;i++){
 
-
-      model.predict([floor(random(60, 71)), floor(random(0, 32))], (err, results) => {
+ let input={input0:floor(random(60, 71))}
+      model.classify(input, (err, results) => {
         if (err) {
           console.log(err);
           return;
@@ -212,7 +214,8 @@ function finishedTraining(err) {
       
     }
     var ndJSON = JSON.stringify(newData);
-    console.log(newData)
+    console.log(newData+'/'+filterNotes)
+
 
     fetch("/api", {
       method: 'POST', // or 'PUT'
@@ -238,21 +241,16 @@ function trainDataButton(){
   makeFile();  
 
 console.log(data);
-for(let times = 0; times < 100; times++){
- for (let item = 0; item < data.length; item++) {
 
-  model.data.addData(
-    {
-      input0: data[item][0],
-      input1: data[item][1],
-    },
-    {
-      output0: data[item][0],
-      output1: data[item][1],
-    });
+ for (let item = 0; item < data.length; item++) {
+  let ins = {input0: data[item][0]};
+  let target = {
+    label: notes[filterNotes[item]]
+  };
+  model.addData(ins,target)
 
  }
-}
+
  
 
   model.normalizeData();
@@ -261,15 +259,14 @@ for(let times = 0; times < 100; times++){
 
 const trainingOptions = {
 
-  epochs: 100,
-  debug: true,
-  task: 'regression',
-  layers: [
-    {
-      type: 'dense',
-      activation: 'relu'
-    }
-  ]
+  epochs: 50,
+  debug: true
+  // layers: [
+  //   {
+  //     type: 'dense',
+  //     activation: 'relu'
+  //   }
+  // ]
  
 }
 
