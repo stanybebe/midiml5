@@ -21,15 +21,7 @@ var mapRange = function(from, to, s) {
   var mapRange = function(s, from, to) {
       return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
     };
-  // checkbox.addEventListener('change',async function() {
-  //   if (this.checked) {
-  //         await Tone.start()
-  //         isOn = true;
-  //         console.log('audio is ready')
-  //   } else {
-  //     Tone.stop;
-  //   }
-  // });
+
   const refreshRate = 1000 / 64;
   var index=0;
    document.getElementById('play').checked = false;
@@ -71,6 +63,7 @@ function printBtn() {
 
       for (var j = 0; j < 12; j++) {
      var btn = document.createElement("input");
+     btn.classList.add('btn');
      btn.setAttribute("type", "radio");
      btn.setAttribute("name", "group"+i);
      btn.setAttribute("class", "btn");
@@ -173,7 +166,7 @@ function setup() {
   noCanvas();
 
   let options = {
-    inputs:1,
+    inputs:2,
     outputs:1,
     debug: 'true',
     task: 'classification'
@@ -194,11 +187,11 @@ function whileTraining(epoch, loss) {
 
 
 function finishedTraining(err) {
-    console.log("finishedTraining");
-  
+
+  // newData.length = 0;
   for(let i =0;i<data.length;i++){
 
- let input={input0:floor(random(0, 127))}
+ let input={input0:floor(random(0, 127)),input1:floor(random(0, 127))}
       model.classify(input, (err, results) => {
         if (err) {
           console.log(err);
@@ -214,7 +207,7 @@ function finishedTraining(err) {
       
     }
 
-    
+  
 
 
     fetch("/api", {
@@ -231,7 +224,6 @@ function finishedTraining(err) {
       .catch((error) => {
         console.error('Error:', error);
       });
-      clear();
     }
 
 function clear(){
@@ -243,9 +235,10 @@ function trainDataButton(){
 console.log(data);
 
  for (let item = 0; item < data.length; item++) {
-  let ins = {input0: data[item][0]};
+  let ins = {input0: data[item][0],input1: data[item][1]};
   let target = {
-    label: notes[filterNotes[item]]
+    label: notes[filterNotes[item]],
+    
   };
   model.addData(ins,target)
  }
@@ -262,9 +255,13 @@ const trainingOptions = {
 }
 
 
-  model.train(trainingOptions, finishedTraining);
+  model.train(trainingOptions, finished);
 
  
  
 
+}
+
+function finished(){
+  console.log('finshed_training')
 }

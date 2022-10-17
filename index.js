@@ -25,7 +25,7 @@ for (let index = 0; index < data.length; index++) {
 
    track.addNote({
       name : data[index][Math.round(Math.random(0,data[0].length))].label,
-      ticks : Math.floor(Math.random(0,32)+(index*2)/4)*128,
+      ticks : Math.floor(Math.random(0,3)+(index*4)/4)*128,
       duration: .09})
 
       
@@ -33,6 +33,7 @@ for (let index = 0; index < data.length; index++) {
 
 
 fs.writeFileSync(Date.now()+"_midiml5_.mid", new Buffer.from(midit.toArray()))
+
 });
 
 const newDJ = fs.readFileSync('public/newData.json', 'utf8');
