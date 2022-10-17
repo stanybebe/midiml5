@@ -26,7 +26,7 @@ for (let index = 0; index < data.length; index++) {
   console.log(data.length);
 
    track.addNote({
-      name : data[index][Math.floor(Math.random(0,3))].label,
+      name : data[index][Math.round(Math.random(0,data[0].length))].label,
       ticks : Math.floor(Math.random(0,32)+(index*2)/4)*128,
       duration: .09})
 
