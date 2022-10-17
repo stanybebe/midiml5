@@ -152,7 +152,7 @@ play.addEventListener('change', () => {
     isOn = false;
   
     
-    var time = 0;
+
     for (let i = 0; i < 32; i++) {
       selectedDiv.push(document.getElementById('div'+i));
   for (let j = 0; j < 12; j++) {
@@ -213,8 +213,8 @@ function finishedTraining(err) {
       });
       
     }
-    var ndJSON = JSON.stringify(newData);
-    console.log(newData+'/'+filterNotes)
+
+    
 
 
     fetch("/api", {
@@ -235,7 +235,7 @@ function finishedTraining(err) {
     }
 
 function clear(){
-  newData = [];
+  newData.length = 0;
 }
 function trainDataButton(){
   makeFile();  
@@ -248,7 +248,6 @@ console.log(data);
     label: notes[filterNotes[item]]
   };
   model.addData(ins,target)
-
  }
 
  
@@ -258,16 +257,8 @@ console.log(data);
 
 
 const trainingOptions = {
-
   epochs: 200,
-  debug: true
-  // layers: [
-  //   {
-  //     type: 'dense',
-  //     activation: 'relu'
-  //   }
-  // ]
- 
+  debug: true 
 }
 
 

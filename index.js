@@ -17,13 +17,11 @@ app.post("/api", (request, response) => {
     data: data
   });
 
- 
-// console.log(nDJP[0][1]);
 var midit = new Midi()
-// add a track
+
 const track = midit.addTrack()
 for (let index = 0; index < data.length; index++) {
-  console.log(data.length);
+
 
    track.addNote({
       name : data[index][Math.round(Math.random(0,data[0].length))].label,
@@ -32,23 +30,12 @@ for (let index = 0; index < data.length; index++) {
 
       
 }
- 
-// write the output
-fs.writeFileSync("midiml5_2.mid", new Buffer.from(midit.toArray()))
+
+
+fs.writeFileSync(Date.now()+"_midiml5_.mid", new Buffer.from(midit.toArray()))
 });
 
-
-// const midiData = fs.readFileSync("public/D.mid")
-// const midi = new Midi(midiData)
 const newDJ = fs.readFileSync('public/newData.json', 'utf8');
-// var tracks=[];
-// for (let i = 0; i <midi.tracks[0].notes.length ; i++) {
-
-   
-//    tracks.push([midi.tracks[0].notes[i].midi,midi.tracks[0].notes[i].ticks]); 
- 
-   
-// }
 
 
 
@@ -56,11 +43,8 @@ const server = http.createServer(app)
 server.on('listening', () => {
  console.log('Listening on port 3000')
 
-
-
  
 })
-// console.log(tracks)
 
 
 
